@@ -2,15 +2,17 @@ using AdventOfCode.Extensions;
 
 namespace AdventOfCode.Days;
 
-public class Day2
+public class Day2() : BaseDay("Day2.txt")
 {
-    public int Analysis(string[] reports)
-    {
-        return reports.Select(report => report.Split(" ", StringSplitOptions.TrimEntries).Select(int.Parse).ToList())
-            .Count(IsSafeReportWithDeleteOneLevel);
-    }
+    public override Task<long> ExecutePartOne() => Task.FromResult((long)Input
+        .Select(report => report.Split(" ", StringSplitOptions.TrimEntries).Select(int.Parse).ToList())
+        .Count(IsSafeReport));
 
-    private bool IsSafeReport(List<int> levels)
+    public override Task<long> ExecutePartTwo() => Task.FromResult((long)Input
+        .Select(report => report.Split(" ", StringSplitOptions.TrimEntries).Select(int.Parse).ToList())
+        .Count(IsSafeReportWithDeleteOneLevel));
+
+    private  bool IsSafeReport(List<int> levels)
     {
         var index = 0;
         var prevAscending = levels[0] < levels[1];
