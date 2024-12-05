@@ -4,17 +4,35 @@ namespace AdventOfCode;
 
 class Program
 {
-    static void Main(string[] args)
+    static async Task Main(string[] args)
     {
-        var str = File.ReadAllLines(Path.Combine("Puzzles", "Day2.txt"));
-        // var day1 = new Day1();
-        // var totalDistance = day1.Analysis(str);
-        // Console.WriteLine(totalDistance);
-
-        var day2 = new Day2();
-        var totalSafeReport = day2.Analysis(str);
-        Console.WriteLine(totalSafeReport);
+        
+        var day = new Day3();
+        
+        await PrintPart("Part one", day.ExecutePartOne);
+        await PrintPart("Part two", day.ExecutePartTwo);
         
         Console.ReadKey();
+    }
+
+    private static async Task PrintPart(string partName, Func<Task<long>> func)
+    {
+        try
+        {
+            var resultOne = await func();
+            Console.ForegroundColor = ConsoleColor.Red;
+            Console.Write($"{partName}: ");
+            Console.ForegroundColor = ConsoleColor.Green;
+            Console.WriteLine(resultOne);
+        }
+        catch (Exception e)
+        {
+            Console.ForegroundColor = ConsoleColor.White;
+            Console.BackgroundColor = ConsoleColor.DarkRed;
+            Console.WriteLine(e);
+        }
+
+        Console.BackgroundColor = ConsoleColor.Black;
+        Console.ForegroundColor = ConsoleColor.White;
     }
 }

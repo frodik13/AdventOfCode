@@ -1,22 +1,22 @@
 namespace AdventOfCode.Days;
 
-public class Day1
+public class Day1() : BaseDay("Day1.txt")
 {
     private readonly List<int> _inputOne = [];
     private readonly List<int> _inputTwo = [];
-    
-    public int Distance(string[] input)
+
+    public override Task<long> ExecutePartOne()
     {
-        ParseInput(input);
+        ParseInput(Input);
         Sort();
-        return CalculateDistance();
+        return Task.FromResult(CalculateDistance());
     }
 
-    public int Analysis(string[] input)
+    public override  Task<long> ExecutePartTwo()
     {
-        ParseInput(input);
+        ParseInput(Input);
         Sort();
-        return Analysis();
+        return Task.FromResult(Analysis());
     }
     
     private void ParseInput(string[] input)
@@ -38,12 +38,12 @@ public class Day1
         _inputTwo.Sort();
     }
 
-    private int CalculateDistance()
+    private long CalculateDistance()
     {
         return _inputOne.Select((t, i) => Math.Abs(t - _inputTwo[i])).Sum();
     }
     
-    private int Analysis()
+    private long Analysis()
     {
         return (from one in _inputOne let count = _inputTwo.Count(x => x == one) select count * one).Sum();
     }
