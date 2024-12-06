@@ -2,23 +2,68 @@ namespace AdventOfCode.Days;
 
 public class Day4() : BaseDay("Day4.txt")
 {
-    public override Task<long> ExecutePartTwo()
-    {
-        throw new NotImplementedException();
-    }
-
     public override Task<long> ExecutePartOne()
     {
         var result = 0L;
         
         for (var i = 0; i < Input.Length; i++)
-            for (var j = 0; j < Input[0].Length; j++)
-                if (Input[i][j] == 'X')
-                    result += FindCountWords(i, j);
+        for (var j = 0; j < Input[0].Length; j++)
+            if (Input[i][j] == 'X')
+                result += FindCountWords(i, j);
+
+        return Task.FromResult(result);
+    }
+    
+    public override Task<long> ExecutePartTwo()
+    {
+        var result = 0L;
+        
+        for (var i = 0; i < Input.Length; i++)
+        for (var j = 0; j < Input[0].Length; j++)
+            if (Input[i][j] == 'A')
+                result += FindX(i, j);
 
         return Task.FromResult(result);
     }
 
+    private long FindX(int i, int j)
+    {
+        var isX = false;
+        var isY = false;
+        if (IsCorrectChar(i - 1, j - 1, 'M'))
+        {
+            if (IsCorrectChar(i + 1, j + 1, 'S'))
+            {
+                isX = true;
+            }
+        }
+        else if (IsCorrectChar(i - 1, j - 1, 'S'))
+        {
+            if (IsCorrectChar(i + 1, j + 1, 'M'))
+            {
+                isX = true;
+            }
+        }
+
+        if (IsCorrectChar(i + 1, j - 1, 'M'))
+        {
+            if (IsCorrectChar(i - 1, j + 1, 'S'))
+            {
+                isY = true;
+            }
+        }
+        else if (IsCorrectChar(i + 1, j - 1, 'S'))
+        {
+            if (IsCorrectChar(i - 1, j + 1, 'M'))
+            {
+                isY = true;
+            }
+        }
+        
+
+        return isX && isY ? 1 : 0;
+    }
+    
     private long FindCountWords(int i, int j)
     {
         return Enum.GetValues<Direction>().LongCount(direction => IsFindWord(i, j, direction));
