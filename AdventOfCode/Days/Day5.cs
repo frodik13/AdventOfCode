@@ -4,6 +4,8 @@ public class Day5 : BaseDay
 {
     private readonly List<string> _pageNumberingRules = [];
     private readonly List<string> _updatePagesNumbers = [];
+    private readonly List<string> _incorrectPagesNumbers = [];
+    
     public Day5() : base("Day5.txt")
     {
         var list = _pageNumberingRules;
@@ -21,16 +23,62 @@ public class Day5 : BaseDay
     
     public override Task<long> ExecutePartOne()
     {
-        var result = (from updatePageNumbers in _updatePagesNumbers
-            select updatePageNumbers.Split(',', StringSplitOptions.RemoveEmptyEntries)
-            into updatePageNumberArray
-            let isRight = IsRight(updatePageNumberArray)
-            where isRight
-            select updatePageNumberArray[updatePageNumberArray.Length / 2]
-            into average
-            select Convert.ToInt64(average)).Sum();
+        long result = 0;
+        foreach (var updatePageNumbers in _updatePagesNumbers)
+        {
+            var updatePageNumberArray = updatePageNumbers.Split(',', StringSplitOptions.RemoveEmptyEntries);
+            if (IsRight(updatePageNumberArray))
+            {
+                var average = updatePageNumberArray[updatePageNumberArray.Length / 2];
+                result += Convert.ToInt64(average);
+            }
+            else
+            {
+                _incorrectPagesNumbers.Add(updatePageNumbers);
+            }
+        }
 
         return Task.FromResult(result);
+    }
+    
+    public override Task<long> ExecutePartTwo()
+    {
+        var result = 0L;
+
+        foreach (var incorrectPageNumbers in _incorrectPagesNumbers)
+        {
+            var incorrectPageNumberArray = incorrectPageNumbers.Split(',', StringSplitOptions.RemoveEmptyEntries);
+            var correctUpdateNumbers = OrganizePageNumbers(incorrectPageNumberArray);
+            
+            var average = correctUpdateNumbers[correctUpdateNumbers.Count / 2];
+            result += Convert.ToInt64(average);
+        }
+
+        return Task.FromResult(result);
+    }
+
+    private List<string> OrganizePageNumbers(string[] updatePageNumberArray)
+    {
+        var result = new List<string>();
+        var pages = updatePageNumberArray.ToList();
+        
+        var index = 0;
+        while (index < pages.Count)
+        {
+            var currentPage = pages[index];
+            var rules = _pageNumberingRules.Where(x => x.StartsWith(currentPage)).ToHashSet();
+            var checks = pages.Where((t, i) => i != index).Select(t => $"{currentPage}|{t}").ToList();
+            if (rules.IsSupersetOf(checks))
+            {
+                result.Add(currentPage);
+                pages.RemoveAt(index);
+                index = -1;
+            }
+            
+            index++;
+        }
+
+        return result;
     }
 
     private bool IsRight(string[] updatePageNumberArray)
@@ -51,10 +99,5 @@ public class Day5 : BaseDay
         }
 
         return true;
-    }
-
-    public override Task<long> ExecutePartTwo()
-    {
-        throw new NotImplementedException();
     }
 }
