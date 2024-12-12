@@ -66,6 +66,52 @@ public class Day7() : BaseDay("Day7.txt")
 
     public override Task<long> ExecutePartTwo()
     {
-        throw new NotImplementedException();
+        var equations = Input
+            .Select(line => line.Split(": "))
+            .Select(parts => new Equation(long.Parse(parts[0]), [..parts[1].Split(' ').Select(long.Parse)]))
+            .ToArray();
+
+        var validEquations = equations
+            .Where(equation => equation.IsValid(false))
+            .Select(equation => equation.Target)
+            .ToList();
+
+        var total = validEquations.Sum();
+        
+        var totalWithConcatenation = equations
+            .Where(e => !validEquations.Contains(e.Target))
+            .Where(e => e.IsValid(true))
+            .Select(e => e.Target)
+            .Sum();
+        
+        return Task.FromResult(totalWithConcatenation + total);
+    }
+}
+
+internal enum Operation
+{
+    None = -1,
+    Add = 0,
+    Multiply = 1,
+}
+
+internal class Equation(long target, long[] Numbers)
+{
+    public long Target { get; } = target;
+    public bool IsValid(bool useConcatenation) => IsValid(useConcatenation, 0, 0);
+
+    private bool IsValid(bool useConcatenation, long acc, int index)
+    {
+        if (index == Numbers.Length) return Target == acc;
+        if (acc > Target) return false;
+        
+        return IsValid(useConcatenation, Math.Max(acc, 1) * Numbers[index], index + 1)
+            || IsValid(useConcatenation, acc + Numbers[index], index + 1)
+            || (useConcatenation && IsValid(true, Concatenate(acc, Numbers[index]), index + 1));
+    }
+
+    private long Concatenate(long first, long second)
+    {
+        return long.Parse($"{first}{second}");
     }
 }
