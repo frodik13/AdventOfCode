@@ -11,4 +11,12 @@ public static class ListExtension
 
         return result;
     }
+
+    public static void AddElementCertainNumberOfElements<T>(this List<T> collection, T element, int elementCount)
+    {
+        for (var i = 0; i < elementCount; i++)
+        {
+            collection.Add(element);
+        }
+    }
 }

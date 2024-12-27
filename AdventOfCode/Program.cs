@@ -6,7 +6,7 @@ class Program
 {
     static async Task Main(string[] args)
     {
-        var day = new Day8();
+        var day = new Day9();
         
         await PrintPart("Part one", day.ExecutePartOne);
         await PrintPart("Part two", day.ExecutePartTwo);
