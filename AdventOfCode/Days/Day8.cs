@@ -73,6 +73,52 @@ public class Day8 : BaseDay
 
     public override Task<long> ExecutePartTwo()
     {
-        throw new NotImplementedException();
+        var rowLen = Input.Length;
+        var colLen = Input[0].Length;
+        var uniqueAntiNodes = new HashSet<Coordinate>();
+        
+        var antennas = Input.SelectMany((x, i) => x.Select((y, j) => (Freq: y, Coord: new Coordinate(i, j))))
+            .Where(x => x.Freq != '.')
+            .ToList();
+        
+        var antennaToCoordinates = antennas.GroupBy(x => x.Freq)
+            .ToDictionary(x => x.Key, x => x.Select(y => y.Coord).ToList());
+        
+        foreach (var antenna in antennas)
+        {
+            var sameFrequencyAntennas = antennaToCoordinates[antenna.Freq]
+                .Where(x => x.Row != antenna.Coord.Row || x.Col != antenna.Coord.Col)
+                .ToList();
+
+            foreach (var coord in sameFrequencyAntennas)
+            {
+                var delta = antenna.Coord - coord;
+                var potentialAntinodeA = antenna.Coord + delta;
+                var potentialAntinodeB = antenna.Coord - delta;
+
+                while (IsInGrid(potentialAntinodeA, rowLen, colLen))
+                {
+                    uniqueAntiNodes.Add(potentialAntinodeA);
+                    potentialAntinodeA = potentialAntinodeA + delta;
+                }
+                while (IsInGrid(potentialAntinodeB, rowLen, colLen))
+                {
+                    uniqueAntiNodes.Add(potentialAntinodeB);
+                    potentialAntinodeB = potentialAntinodeB - delta;
+                }
+            }
+        }
+        
+        return Task.FromResult((long)uniqueAntiNodes.Count);
+    }
+
+    public static bool IsInGrid(Coordinate coord, int rowLen, int colLen) =>
+        0 <= coord.Row && coord.Row < rowLen && 0 <= coord.Col && coord.Col < colLen;
+    
+    public sealed record Coordinate(int Row, int Col)
+    {
+        public static Coordinate operator +(Coordinate a, Coordinate b) => new(a.Row + b.Row, a.Col + b.Col);
+
+        public static Coordinate operator -(Coordinate a, Coordinate b) => new(a.Row - b.Row, a.Col - b.Col);
     }
 }
